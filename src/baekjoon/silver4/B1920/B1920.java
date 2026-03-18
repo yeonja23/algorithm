@@ -1,4 +1,4 @@
-package baekjoon.silver4;
+package baekjoon.silver4.B1920;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,6 +33,6 @@ public class B1920 {
             }
         }
 
-        System.out.println(sb.toString());
+        System.out.println(sb);
     }
 }

@@ -23,15 +23,14 @@ public class B13458 {
         int B = Integer.parseInt(st.nextToken());
         int C = Integer.parseInt(st.nextToken());
 
-        int temp;
-        int count = 0;
-
-        for (int num : A ) {
-            ++count;
-            temp = num - B;
-            while (temp > 0) {
-                temp -= C;
-                count++;
+        long count = N;
+        for (int num : A) {
+            num -= B;
+            if (num > 0) {
+                count += num / C;
+                if (num % C != 0) {
+                    count++;
+                }
             }
         }
 

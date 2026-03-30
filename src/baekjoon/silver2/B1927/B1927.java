@@ -9,7 +9,6 @@ import java.util.List;
 public class B1927 {
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringBuilder sb = new StringBuilder();
         MinHeap heap = new MinHeap();
 
         int N = Integer.parseInt(br.readLine());
@@ -17,11 +16,10 @@ public class B1927 {
             int X = Integer.parseInt(br.readLine());
 
             if (X == 0) {
-                System.out.println(heap.deleteMin());;
+                System.out.println(heap.remove());;
             } else {
                 heap.insert(X);
             }
-
         }
     }
 
@@ -35,72 +33,59 @@ public class B1927 {
 
         public void insert(int value) {
             heap.add(value);
-            if (heap.size() == 1) {
-                return;
-            }
+            heapifyUp(heap.size() - 1);
+        }
 
-            int index = heap.size() - 1;
+        private void heapifyUp(int index) {
             while (index > 0) {
-                int parent = (index - 1) / 2;
-                if (heap.get(parent) > heap.get(index)) {
-                    swap(parent, index);
+                int parentIndex = (index - 1) / 2;
+                if (heap.get(parentIndex) <= heap.get(index)) {
+                    break;
                 }
-                index = parent;
+                swap(parentIndex, index);
+                index = parentIndex;
             }
         }
 
-        public int deleteMin() {
-            int index = 0;
+        public int remove() {
             if (heap.isEmpty()) {
                 return 0;
             }
-            int result = heap.get(index);
-            int temp = heap.get(heap.size() - 1);
-            heap.remove(heap.size() - 1);
-            if (heap.isEmpty()) {
-                return result;
+            int min = heap.get(0);
+            int end = heap.remove(heap.size() - 1);
+            if (!heap.isEmpty()) {
+                heap.set(0, end);
+                heapifyDown(0);
             }
-            heap.set(index, temp);
+            return min;
+        }
 
-            int left = 2 * index + 1;
-            int right = 2 * index + 2;
-            int smallest = index;
+        private void heapifyDown(int index) {
+            while (index < heap.size()) {
+                int left = 2 * index + 1;
+                int right = 2 * index + 2;
+                int smallest = index;
 
-            while (index < heap.size() - 1) {
-                if (
-                        left < heap.size() &&
-                        right < heap.size() &&
-                        heap.get(left) > heap.get(right)
-                ) {
+                if ( left < heap.size() && heap.get(left) < heap.get(smallest) ) {
+                    smallest = left;
+                }
+
+                if ( right < heap.size() && heap.get(right) < heap.get(smallest) ) {
                     smallest = right;
-                } else if (
-                        left < heap.size() &&
-                        right < heap.size() &&
-                        heap.get(left) < heap.get(right)
-                ) {
-                    smallest = left;
-                } else if (left < heap.size()) {
-                    smallest = left;
-                } else {
-                    return result;
                 }
 
-                if (heap.get(index) > heap.get(smallest)) {
-                    swap(index, smallest);
+                if (smallest == index) {
+                    break;
                 }
 
-                index = smallest;
-                left = 2 * index + 1;
-                right = 2 * index + 2;
+                swap(index, smallest);
             }
-
-            return result;
         }
 
         public void swap(int i, int j) {
-            int temp = this.heap.get(i);
-            this.heap.set(i, this.heap.get(j));
-            this.heap.set(j, temp);
+            int temp = heap.get(i);
+            heap.set(i, heap.get(j));
+            heap.set(j, temp);
         }
     }
 }

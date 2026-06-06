@@ -7,85 +7,69 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.StringTokenizer;
 
+// 익은 토마토가 start
 public class Main {
-
-    private static final int RIPE = 1;
-    private static final int UNRIPE = 0;
-
-    private static final int[] ROW_DIR = {1, -1, 0, 0};
-    private static final int[] COL_DIR = {0, 0, 1, -1};
-
-    private static int rows;
-    private static int cols;
-    private static int[][] box;
-
-    static class Position {
-        final int row;
-        final int col;
-        final int day;
-
-        Position(int row, int col, int day) {
-            this.row = row;
-            this.col = col;
-            this.day = day;
-        }
-    }
+    static int COL;
+    static int ROW;
+    static int[][] tomatoes;
+    static int goalCount = 0;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
 
-        cols = Integer.parseInt(st.nextToken());
-        rows = Integer.parseInt(st.nextToken());
-        box = new int[rows][cols];
+        COL = Integer.parseInt(st.nextToken());
+        ROW = Integer.parseInt(st.nextToken());
 
-        Deque<Position> queue = new ArrayDeque<>();
+        tomatoes = new int[ROW][COL];
 
-        for (int r = 0; r < rows; r++) {
+        int node;
+        for (int i = 0; i < ROW; i++) {
             st = new StringTokenizer(br.readLine());
-            for (int c = 0; c < cols; c++) {
-                box[r][c] = Integer.parseInt(st.nextToken());
-                if (box[r][c] == RIPE) {
-                    queue.add(new Position(r, c, 0));
+            for (int j = 0; j < COL; j++) {
+                node = Integer.parseInt(st.nextToken());
+                if (node == 0) {
+                    ++goalCount;
                 }
+                tomatoes[i][j] = node;
             }
         }
 
-        int result = bfs(queue);
-        System.out.println(result);
+        System.out.println(BFS());
     }
 
-    private static int bfs(Deque<Position> queue) {
-        int lastDay = 0;
+    static int BFS() {
+        if (goalCount == 0) return 0;
+
+        boolean[][] visited = new boolean[ROW][COL];
+        Deque<int[]> queue = new ArrayDeque<>();
+        int meet0 = 0;
+
+        for (int r = 0; r <ROW; r++) {
+            for (int c = 0; c < COL; c++) {
+                if (tomatoes[r][c] == 1) queue.add(new int[] { r, c, 0 });
+            }
+        }
 
         while (!queue.isEmpty()) {
-            Position current = queue.poll();
-            lastDay = current.day;
+            int[] u = queue.remove();
+            int r = u[0], c = u[1], distance = u[2];
 
-            for (int i = 0; i < 4; i++) {
-                int nextRow = current.row + ROW_DIR[i];
-                int nextCol = current.col + COL_DIR[i];
+            if (visited[r][c]) continue;
+            visited[r][c] = true;
 
-                if (isInBounds(nextRow, nextCol) && box[nextRow][nextCol] == UNRIPE) {
-                    box[nextRow][nextCol] = RIPE;
-                    queue.add(new Position(nextRow, nextCol, lastDay + 1));
-                }
-            }
+            if (tomatoes[r][c] == -1) continue;
+
+            if (tomatoes[r][c] == 0) ++meet0;
+
+            if (goalCount == meet0) return distance;
+
+            if (r > 0) queue.add(new int[] { r-1, c, distance+1});
+            if (r < ROW-1) queue.add(new int[] { r+1, c, distance+1});
+            if (c > 0) queue.add(new int[] { r, c-1, distance+1});
+            if (c < COL-1) queue.add(new int[] { r, c+1, distance+1});
         }
 
-        return hasUnripeTomato() ? -1 : lastDay;
-    }
-
-    private static boolean isInBounds(int row, int col) {
-        return row >= 0 && row < rows && col >= 0 && col < cols;
-    }
-
-    private static boolean hasUnripeTomato() {
-        for (int r = 0; r < rows; r++) {
-            for (int c = 0; c < cols; c++) {
-                if (box[r][c] == UNRIPE) return true;
-            }
-        }
-        return false;
+        return -1;
     }
 }
